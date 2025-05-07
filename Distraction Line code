@@ -1,0 +1,69 @@
+    # DISTRACTION LINE CODE
+        # time for robot to look ahead
+        look_time = 0.5
+
+        while line_sensor_M.value() == 1:
+            line_sensor_value = line_sensor_M.value()
+            screen_show("driving forwards")
+            print("driving forwards")
+            last_cmd = "M"
+            motor_drive(SP, 0, None)
+            #print(example)
+
+        # Check left sensor
+        if line_sensor_L.value() == 1:
+            print("Left sensor triggered, checking forward...")
+
+            # Move forward briefly to test if center still sees the line
+            motor_drive(SP, 0, None)
+            time.sleep(look_time)
+
+        if line_sensor_M.value() == 1:
+            # Line continues (ignore left distraction)
+            print("Line continues forward — ignoring left")
+            screen_show("continuing forward")
+            last_cmd = "M"
+            motor_drive(SP, 0, None)
+        else:
+            # No line ahead (commit to left turn)
+            print("No line ahead — turning left")
+            screen_show("turning left")
+            last_cmd = "L"
+            while line_sensor_L.value() == 1:
+                motor_drive(SP, -TS, None)
+
+        # Check right sensor
+        elif line_sensor_R.value() == 1:
+            print("Right sensor triggered, checking forward...")
+
+        # Move forward briefly to test if center still sees the line
+        motor_drive(SP, 0, None)
+        time.sleep(look_time)
+
+        if line_sensor_M.value() == 1:
+            # Line continues (ignore right distraction)
+            print("Line continues forward — ignoring right")
+            screen_show("continuing forward")
+            last_cmd = "M"
+            motor_drive(SP, 0, None)
+        else:
+            # No line ahead (commit to right turn)
+            print("No line ahead — turning right")
+            screen_show("turning right")
+            last_cmd = "R"
+            while line_sensor_R.value() == 1:
+                motor_drive(SP, TS, None)
+
+        while line_sensor_R.value() == 0 and line_sensor_L.value() == 0 and line_sensor_M.value() == 0:
+
+            if last_cmd == "R":
+                last_cmd = "rR"
+                screen_show("remember - R")
+                print("remember - R")
+                motor_drive(SP, TS, None)
+
+            if last_cmd == "L":
+                last_cmd = "rL"
+                screen_show("remember - L")
+                print("remember - L")
+                motor_drive(SP, -TS, None)
